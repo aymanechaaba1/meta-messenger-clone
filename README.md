@@ -2,6 +2,7 @@
 
 Using the latest features of nextjs
 
+- NextAuth Athentication with Google & Github
 - Server Actions
 - Optimistic Updates (useOptimistic)
 
