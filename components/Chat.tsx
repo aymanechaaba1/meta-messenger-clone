@@ -4,6 +4,7 @@ import { sendMessage } from '@/actions/actions';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import { v4 as uuidv4 } from 'uuid';
+import TimeAgo from 'react-timeago';
 
 import {
   useEffect,
@@ -11,14 +12,27 @@ import {
   useRef,
 } from 'react';
 import { clientPusher } from '@/lib/pusher';
+import { SessionProvider, useSession } from 'next-auth/react';
+import redis from '@/lib/redis';
+import { Session } from 'next-auth';
+import Message from './Message';
 
 type Props = {
   messages: Message[];
+  session: Session;
 };
 
-function Chat({ messages }: Props) {
-  const isUser = true;
+function Chat({ session, messages }: Props) {
+  // const { data: session, status } = useSession();
+
+  const currentUser: User = {
+    email: session?.user?.email as string,
+    username: session?.user?.name as string,
+    profile_pic: session.user?.image as string,
+  };
+
   const formRef = useRef<HTMLFormElement>(null);
+  const chatMessagesRef = useRef<HTMLDivElement>(null);
 
   const [optimisticMessages, addOptimisticMessage] = useOptimistic<Message[]>(
     messages,
@@ -27,65 +41,35 @@ function Chat({ messages }: Props) {
   );
 
   useEffect(() => {
-    const channel = clientPusher.subscribe('messages');
+    // Scroll to the bottom when messages change or component mounts
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current!.scrollTop =
+        chatMessagesRef.current?.scrollHeight;
+    }
+  }, [optimisticMessages]);
+
+  useEffect(() => {
+    // const channel = clientPusher.subscribe('messages');
     // channel.bind('new-message', async (message: Message) => {
-    // addOptimisticMessage(message);
+    //   addOptimisticMessage(message);
     // });
     // return () => {
     //   clientPusher.unsubscribe('messages');
     //   channel.unbind('new-message');
     // };
-
-    return () => {
-      clientPusher.unsubscribe('messages');
-    };
-  }, [clientPusher]);
-
-  const redisTime = (seconds: number) => new Date(seconds * 1000);
+  }, []);
 
   return (
     <>
-      <Header />
-      <div className="space-y-4 flex-1 overflow-scroll p-5">
+      <Header user={currentUser} />
+      <div
+        className="flex gap-4 flex-col flex-1 overflow-scroll p-5"
+        ref={chatMessagesRef}
+      >
         {optimisticMessages.map((message) => (
-          <div
-            key={message.message_id}
-            className={`flex ${isUser && 'flex-row-reverse'} gap-2`}
-          >
-            <Image
-              src={message.profile_pic}
-              alt="profile_pic"
-              width={40}
-              height={40}
-              className="rounded-lg object-cover"
-            />
-            <div className="space-y-1">
-              <p
-                className={`text-xs text-slate-500 ${
-                  isUser ? 'text-right' : 'text-left'
-                }`}
-              >
-                {message.username}
-              </p>
-              <p
-                className={`${
-                  isUser ? 'bg-blue-400' : 'bg-orange-600'
-                }  py-2 px-3 rounded-lg text-slate-100`}
-              >
-                {message.content}
-              </p>
-              <small
-                className={`text-slate-500 opacity-90 ${
-                  isUser ? 'float-right' : 'float-left'
-                }`}
-              >
-                {new Intl.DateTimeFormat('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                }).format(new Date(Date.now()))}
-              </small>
-            </div>
-          </div>
+          <SessionProvider>
+            <Message message={message} />
+          </SessionProvider>
         ))}
       </div>
       <form
@@ -93,15 +77,17 @@ function Chat({ messages }: Props) {
         action={async (formData: FormData) => {
           const content = formData.get('content') as string;
           if (!content) return;
+          if (!session) return;
 
           const newMessage: Message = {
             message_id: uuidv4(),
             content,
-            created_at: Date.now(),
-            profile_pic:
-              'https://avatars.githubusercontent.com/u/125804169?v=4',
-            username: 'Aymane Chaaba',
-            email: 'aymanechaaba@gmail.com',
+            created_at: await redis.time(),
+            user: {
+              email: session?.user?.email!,
+              username: session.user?.name!,
+              profile_pic: session?.user?.image!,
+            },
           };
 
           // optimistic stuff

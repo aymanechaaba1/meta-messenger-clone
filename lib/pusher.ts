@@ -10,7 +10,7 @@ const serverPusher = new Pusher({
 });
 
 const clientPusher = new ClientPusher(process.env.PUSHER_KEY!, {
-  cluster: process.env.PUSHER_CLUSTER!,
+  cluster: 'eu',
   forceTLS: true,
 });
 

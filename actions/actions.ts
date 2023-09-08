@@ -8,7 +8,7 @@ export const sendMessage = async (message: Message) => {
   try {
     await redis.rpush('messages', JSON.stringify(message));
     // pusher
-    serverPusher.trigger('messages', 'new-message', message);
+    serverPusher.trigger('messages', 'new-message', JSON.stringify(message));
   } catch (err) {
     return err;
   } finally {

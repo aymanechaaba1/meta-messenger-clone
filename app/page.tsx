@@ -1,20 +1,16 @@
-'use client';
-
 import Chat from '@/components/Chat';
-import { clientPusher } from '@/lib/pusher';
 import redis from '@/lib/redis';
-import {
-  experimental_useOptimistic as useOptimistic,
-  useEffect,
-  useState,
-} from 'react';
+import { getServerSession } from 'next-auth';
+import { SessionProvider } from 'next-auth/react';
 
 export default async function Home() {
   const messages: Message[] = await redis.lrange('messages', 0, -1);
+  const session = await getServerSession();
 
   return (
     <>
-      <Chat messages={messages} />
+      {/* @ts-ignore */}
+      <Chat session={session} messages={messages} />
     </>
   );
 }
