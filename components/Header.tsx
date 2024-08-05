@@ -13,7 +13,7 @@ import { Button } from './ui/button';
 
 function Header() {
   return (
-    <div className="flex justify-between container">
+    <div className="flex justify-between container py-3">
       <FaFacebookMessenger size={30} />
       <div>
         <SignedOut>

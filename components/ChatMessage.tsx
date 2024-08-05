@@ -1,12 +1,11 @@
 'use client';
 
 import { pusher } from '@/lib/pusher';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import * as timeago from 'timeago.js';
-import redis, { clientRedis } from '@/lib/redis';
 
 export type Message = {
   id: string;
@@ -19,12 +18,15 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
   let [messages, setMessages] = useState<Message[]>(_messages);
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
+  let scrollTargetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let channel = pusher.subscribe('my-channel');
     channel.bind('my-event', (data: Message) => {
       setMessages((prev) => [...prev, data]);
     });
+
+    scrollTargetRef.current?.scrollIntoView({ behavior: 'smooth' });
 
     return () => {
       channel.unsubscribe();
@@ -33,7 +35,11 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
   }, [messages, pusher]);
 
   return (
-    <div className={cn('space-y-4 flex flex-col')}>
+    <div
+      className={cn(
+        'space-y-4 flex flex-col my-3 container flex-grow overflow-scroll h-0'
+      )}
+    >
       {messages.map((message, i) => (
         <div key={message.id}>
           <p
@@ -69,6 +75,7 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
           </div>
         </div>
       ))}
+      <div ref={scrollTargetRef} />
     </div>
   );
 }

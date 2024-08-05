@@ -31,14 +31,12 @@ export default async function RootLayout({
       <html lang="en">
         <body
           className={cn(
-            'min-h-screen flex flex-col bg-background font-sans antialiased py-5',
+            'min-h-screen flex flex-col bg-background font-sans antialiased',
             fontSans.variable
           )}
         >
           <Header />
-          <main className="flex-1 container py-5 overflow-y-scroll">
-            {children}
-          </main>
+          {children}
           <ChatInput />
         </body>
       </html>

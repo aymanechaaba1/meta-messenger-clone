@@ -9,17 +9,12 @@ import ChatMessage, { type Message } from '@/components/ChatMessage';
 export default async function Home() {
   let { userId } = auth();
   let messagesJSON = await redis.lrange(`messages`, 0, -1);
-  let messages = messagesJSON.map((message) =>
-    JSON.parse(message)
-  ) as Message[];
+  let messages = messagesJSON
+    .map((message) => JSON.parse(message))
+    .sort(
+      (message1: Message, message2: Message) =>
+        message1.timestamp - message2.timestamp
+    ) as Message[];
 
-  return (
-    <div>
-      {userId && (
-        <Chat>
-          <ChatMessage _messages={messages} />
-        </Chat>
-      )}
-    </div>
-  );
+  return userId && <ChatMessage _messages={messages} />;
 }
