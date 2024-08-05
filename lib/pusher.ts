@@ -1,17 +1,14 @@
-import Pusher from 'pusher';
-import ClientPusher from 'pusher-js';
+import ServerPusher from 'pusher';
+import Pusher from 'pusher-js';
 
-const serverPusher = new Pusher({
-  appId: process.env.PUSHER_APP_ID!,
-  key: process.env.PUSHER_KEY!,
+export const serverPusher = new ServerPusher({
+  appId: '1844939',
+  key: '634c0764ea342e8d4df8',
   secret: process.env.PUSHER_SECRET!,
   cluster: 'eu',
   useTLS: true,
 });
 
-const clientPusher = new ClientPusher(process.env.PUSHER_KEY!, {
+export const pusher = new Pusher('634c0764ea342e8d4df8', {
   cluster: 'eu',
-  forceTLS: true,
 });
-
-export { serverPusher, clientPusher };

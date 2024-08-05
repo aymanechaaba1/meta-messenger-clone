@@ -1,52 +1,44 @@
-'use client';
-
-import { sendMessage } from '@/actions/actions';
+import React from 'react';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { IoIosSend } from 'react-icons/io';
+import { serverPusher } from '@/lib/pusher';
+import { auth } from '@clerk/nextjs/server';
 import redis from '@/lib/redis';
-import { revalidatePath } from 'next/cache';
-import { experimental_useOptimistic as useOptimistic } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
-type Props = {
-  messages: Message[];
-};
+import { Message } from './ChatMessage';
 
 function ChatInput() {
+  const { userId } = auth();
+
+  async function sendMessage(formData: FormData) {
+    'use server';
+
+    let data = Object.fromEntries(formData.entries()) as { message: string };
+    if (!data.message || !userId) return;
+
+    let newMessage: Message = {
+      id: uuidv4(),
+      message: data.message,
+      userId,
+      timestamp: Date.now(),
+    };
+
+    serverPusher.trigger('my-channel', 'my-event', newMessage);
+
+    await redis.lpush(`messages`, JSON.stringify(newMessage));
+  }
+
   return (
-    <form
-      action={async (formData: FormData) => {
-        const content = formData.get('content') as string;
-        if (!content) return;
-
-        const message_id = uuidv4();
-        const newMessage = {
-          message_id,
-          content,
-          created_at: await redis.time(),
-          profile_pic: 'https://avatars.githubusercontent.com/u/125804169?v=4',
-          username: 'Aymane Chaaba',
-          email: 'aymanechaaba@gmail.com',
-        };
-
-        // optimistic stuff
-
-        // add message to redis db (server stuff)
-        // await sendMessage(newMessage);
-      }}
-      className="flex py-2 bg-white gap-4"
-      autoComplete="off"
-    >
-      <input
-        type="text"
+    <form action={sendMessage} className="flex items-center gap-x-5 container">
+      <Input
+        name="message"
         placeholder="type a message..."
-        name="content"
-        className="flex-1 outline-none rounded-lg border px-3"
+        autoComplete="off"
       />
-      <button
-        type="submit"
-        className="bg-blue-500 text-white text-center rounded-lg hover:shadow-lg py-2 px-5"
-      >
-        Send
-      </button>
+      <Button type="submit">
+        <IoIosSend size={23} />
+      </Button>
     </form>
   );
 }

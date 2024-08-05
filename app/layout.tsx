@@ -2,22 +2,46 @@ import { Metadata } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import ChatInput from '@/components/ChatInput';
-import { SessionProvider } from 'next-auth/react';
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs';
+import { Inter as FontSans } from 'next/font/google';
+import { cn } from '@/lib/utils';
+
+const fontSans = FontSans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Meta Messenger Clone',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="">
-        <main className="flex flex-col h-screen">{children}</main>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <body
+          className={cn(
+            'min-h-screen flex flex-col bg-background font-sans antialiased py-5',
+            fontSans.variable
+          )}
+        >
+          <Header />
+          <main className="flex-1 container py-5 overflow-y-scroll">
+            {children}
+          </main>
+          <ChatInput />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
