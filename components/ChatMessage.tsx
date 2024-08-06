@@ -1,11 +1,14 @@
 'use client';
 
 import { pusher } from '@/lib/pusher';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useAuth, useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import * as timeago from 'timeago.js';
+import { TypingContext } from '@/providers/IsTypingProvider';
+import { triggerTyping } from '@/actions/triggerTyping';
+import { toast } from 'sonner';
 
 export type Message = {
   id: string;
@@ -20,11 +23,28 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
   const { isLoaded, userId, sessionId, getToken } = useAuth();
   const { user } = useUser();
   let scrollTargetRef = useRef<HTMLDivElement>(null);
+  // let typingContext = useContext(TypingContext);
+  let [isTyping, setIsTyping] = useState<boolean>(false);
 
   useEffect(() => {
     let channel = pusher.subscribe('my-channel');
     channel.bind('my-event', (data: Message) => {
       setMessages((prev) => [...prev, data]);
+      // toast(
+      //   <div className="flex items-center gap-x-2">
+      //     {data.imageUrl && (
+      //       <Image
+      //         src={data.imageUrl}
+      //         width={30}
+      //         height={30}
+      //         alt={data.userId}
+      //         className="object-cover rounded-full"
+      //       />
+      //     )}
+      //     <p>new message</p>
+      //   </div>
+      // );
+      // toast(`new message from`);
     });
 
     scrollTargetRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,7 +53,7 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
       channel.unsubscribe();
       pusher.unsubscribe('my-channel');
     };
-  }, [messages, pusher]);
+  }, [messages, pusher, isTyping, setIsTyping]);
 
   return (
     <div className={cn('space-y-4 flex flex-col my-3 container')}>

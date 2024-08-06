@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.12",
+    "@clerk/themes": "^2.1.18",
     "@radix-ui/react-slot": "^1.1.0",
     "@supabase/auth-helpers-nextjs": "^0.7.4",
     "@supabase/supabase-js": "^2.33.1",
@@ -37,7 +38,9 @@
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.1",
     "react-timeago": "^7.2.0",
+    "sharp": "^0.33.4",
     "socket.io": "^4.7.5",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",

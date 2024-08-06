@@ -11,6 +11,8 @@ import {
 } from '@clerk/nextjs';
 import { Inter as FontSans } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import IsTypingProvider from '@/providers/IsTypingProvider';
+import { Toaster, toast } from 'sonner';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -28,18 +30,21 @@ export default async function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={cn(
-            'min-h-screen flex flex-col bg-background font-sans antialiased',
-            fontSans.variable
-          )}
-        >
-          <Header />
-          <main className="flex-grow overflow-scroll h-0">{children}</main>
-          <ChatInput />
-        </body>
-      </html>
+      <IsTypingProvider>
+        <Toaster />
+        <html lang="en">
+          <body
+            className={cn(
+              'min-h-screen flex flex-col bg-background font-sans antialiased',
+              fontSans.variable
+            )}
+          >
+            <Header />
+            <main className="flex-grow overflow-scroll h-0">{children}</main>
+            <ChatInput />
+          </body>
+        </html>
+      </IsTypingProvider>
     </ClerkProvider>
   );
 }

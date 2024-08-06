@@ -1,8 +1,12 @@
-import React, { useContext } from 'react';
+'use client';
+
+import React, { useContext, useEffect, useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
-import { IoIosSend } from 'react-icons/io';
+import { IoMdSend } from 'react-icons/io';
 import { sendMessage } from '@/actions/sendMessage';
+import { TypingContext } from '@/providers/IsTypingProvider';
+import { triggerTyping } from '@/actions/triggerTyping';
 
 function ChatInput() {
   return (
@@ -16,9 +20,9 @@ function ChatInput() {
         autoComplete="off"
         className="shadow-sm flex-1"
       />
-      <Button type="submit" className="shadow-sm rounded-xl">
-        <IoIosSend size={23} />
-      </Button>
+      <button type="submit" className="shadow-sm rounded-xl">
+        <IoMdSend size={30} />
+      </button>
     </form>
   );
 }
