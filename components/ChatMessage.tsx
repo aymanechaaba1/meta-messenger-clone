@@ -35,11 +35,7 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
   }, [messages, pusher]);
 
   return (
-    <div
-      className={cn(
-        'space-y-4 flex flex-col my-3 container flex-grow overflow-scroll h-0'
-      )}
-    >
+    <div className={cn('space-y-4 flex flex-col my-3 container')}>
       {messages.map((message, i) => (
         <div key={message.id}>
           <p

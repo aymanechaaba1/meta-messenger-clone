@@ -36,7 +36,7 @@ export default async function RootLayout({
           )}
         >
           <Header />
-          {children}
+          <main className="flex-grow overflow-scroll h-0">{children}</main>
           <ChatInput />
         </body>
       </html>

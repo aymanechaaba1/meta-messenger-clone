@@ -9,9 +9,10 @@ import { v4 as uuidv4 } from 'uuid';
 
 export async function sendMessage(formData: FormData) {
   const { userId } = auth();
+  if (!userId) return;
 
   let data = Object.fromEntries(formData.entries()) as { message: string };
-  if (!data.message || !userId) return;
+  if (!data.message) return;
 
   let newMessage: Message = {
     id: uuidv4(),
