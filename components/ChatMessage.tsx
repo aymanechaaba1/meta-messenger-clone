@@ -12,6 +12,7 @@ export type Message = {
   message: string;
   userId: string;
   timestamp: number;
+  imageUrl?: string;
 };
 
 function ChatMessage({ _messages }: { _messages: Message[] }) {
@@ -52,7 +53,7 @@ function ChatMessage({ _messages }: { _messages: Message[] }) {
           >
             {user?.imageUrl && (
               <Image
-                src={user?.imageUrl!}
+                src={message.imageUrl!}
                 width={30}
                 height={30}
                 alt="user"

@@ -16,5 +16,7 @@ export default async function Home() {
         message1.timestamp - message2.timestamp
     ) as Message[];
 
+  console.log(messages);
+
   return userId && <ChatMessage _messages={messages} />;
 }

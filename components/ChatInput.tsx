@@ -8,7 +8,7 @@ function ChatInput() {
   return (
     <form
       action={sendMessage}
-      className="flex items-center gap-x-5 container bg-transparent py-3 shadow-lg"
+      className="flex items-center gap-x-5 container bg-transparent py-3"
     >
       <Input
         name="message"
